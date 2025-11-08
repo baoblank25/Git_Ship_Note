@@ -18,7 +18,7 @@ CORS(app)
 # GitService: Handles reading git repositories
 # AIService: Handles AI generation with Claude
 # git_service = GitService()
-ai_service = AIService(api_key=os.getenv("ANTHROPIC_API_KEY"))
+ai_service = AIService()
 
 
 # Server Running Endpoint

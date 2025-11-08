@@ -15,6 +15,34 @@ class AIService:
             )
         
         self.client = anthropic.Anthropic(api_key=self.api_key)
+    
+    def generate_release_notes(self, commits: list, from_ref: str = None, to_ref: str = 'HEAD') -> str:
+        """
+        Generate release notes from a list of commits.
+        This method is called by app.py endpoints.
+        
+        Args:
+            commits: List of commit dictionaries with hash, message, author, date
+            from_ref: Starting reference (optional)
+            to_ref: Ending reference
+            
+        Returns:
+            Markdown-formatted release notes as a string
+        """
+        # Format commits into readable text
+        commit_text = "\n".join([
+            f"- {commit['hash']}: {commit['message']} (by {commit.get('author', 'Unknown')})"
+            for commit in commits
+        ])
+        
+        # Use the existing generate_changelog method
+        git_log = f"Commits from {from_ref or 'start'} to {to_ref}:\n\n{commit_text}"
+        result = self.generate_changelog(git_log)
+        
+        if result['success']:
+            return result['changelog']
+        else:
+            raise Exception(result['error'])
         
     def generate_changelog(self, git_log: str) -> Dict[str, Any]:
         system_prompt = """You are a professional technical writer specializing in creating clean, user-friendly changelogs.
