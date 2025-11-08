@@ -1,8 +1,10 @@
 import anthropic
 import os
 from typing import Dict, Any
+from dotenv import load_dotenv
 
 
+load_dotenv()
 class AIService:
     def __init__(self):
         self.api_key = os.getenv("ANTHROPIC_API_KEY")
@@ -45,46 +47,47 @@ class AIService:
             raise Exception(result['error'])
         
     def generate_changelog(self, git_log: str) -> Dict[str, Any]:
-        system_prompt = """You are a professional technical writer specializing in creating clean, user-friendly changelogs.
+        system_prompt = """
+        You are a professional technical writer specializing in creating clean, user-friendly changelogs.
 
-Your task is to analyze git commit history and create a changelog that:
+        Your task is to analyze git commit history and create a changelog that:
 
-1. **Categorizes commits** into:
-   - 🎉 Features: New functionality, capabilities, or additions
-   - 🐛 Fixes: Bug fixes, error corrections, or patches
-   - ⚡ Improvements: Enhancements, optimizations, or refactoring
-   - 📚 Documentation: Docs, README, or comment updates
-   - 🔧 Other: Configuration, dependencies, or miscellaneous changes
+        1. **Categorizes commits** into:
+        - 🎉 Features: New functionality, capabilities, or additions
+        - 🐛 Fixes: Bug fixes, error corrections, or patches
+        - ⚡ Improvements: Enhancements, optimizations, or refactoring
+        - 📚 Documentation: Docs, README, or comment updates
+        - 🔧 Other: Configuration, dependencies, or miscellaneous changes
 
-2. **Filters out noise**:
-   - Ignore: merge commits, version bumps, "WIP" commits
-   - Ignore: trivial updates like "fix typo", "update .gitignore"
-   - Ignore: developer-only changes that don't affect users
+        2. **Filters out noise**:
+        - Ignore: merge commits, version bumps, "WIP" commits
+        - Ignore: trivial updates like "fix typo", "update .gitignore"
+        - Ignore: developer-only changes that don't affect users
 
-3. **Writes clearly**:
-   - Use plain, non-technical language
-   - Focus on WHAT changed and WHY it matters to users
-   - Keep descriptions concise (1-2 lines max)
-   - Remove commit hashes and technical jargon
+        3. **Writes clearly**:
+        - Use plain, non-technical language
+        - Focus on WHAT changed and WHY it matters to users
+        - Keep descriptions concise (1-2 lines max)
+        - Remove commit hashes and technical jargon
 
-4. **Formats in Markdown**:
-🎉 Features
-Brief description of what was added
+        4. **Formats in Markdown**:
+        🎉 Features
+        Brief description of what was added
 
-🐛 Fixes
-Brief description of what was fixed
+        🐛 Fixes
+        Brief description of what was fixed
 
-⚡ Improvements
-Brief description of what was improved
+        ⚡ Improvements
+        Brief description of what was improved
 
-text
+        text
 
-**Important Rules:**
-- Only include categories that have actual content
-- If there are no meaningful changes, say "No significant changes"
-- Group similar commits together
-- Be concise and user-focused
-- Use bullet points, not numbered lists"""
+        **Important Rules:**
+        - Only include categories that have actual content
+        - If there are no meaningful changes, say "No significant changes"
+        - Group similar commits together
+        - Be concise and user-focused
+        - Use bullet points, not numbered lists"""
 
         try:
             message = self.client.messages.create(
@@ -144,18 +147,19 @@ text
 if __name__ == "__main__":
     service = AIService()
     
-    sample_log = """commit abc123
-Author: Dev <dev@example.com>
-Date: Mon Nov 4 10:00:00 2024
+    sample_log = """
+        commit abc123
+        Author: Dev <dev@example.com>
+        Date: Mon Nov 4 10:00:00 2024
 
-    Add user authentication
+            Add user authentication
 
-commit def456
-Author: Dev <dev@example.com>
-Date: Mon Nov 4 09:00:00 2024
+        commit def456
+        Author: Dev <dev@example.com>
+        Date: Mon Nov 4 09:00:00 2024
 
-    Fix login bug where password wasn't validating
-"""
+        Fix login bug where password wasn't validating
+        """
     
     result = service.generate_changelog(sample_log)
     print(result["changelog"] if result["success"] else result["error"])
