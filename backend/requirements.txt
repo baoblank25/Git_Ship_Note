@@ -1,0 +1,21 @@
+# Core Flask
+flask==3.0.0
+flask-cors==4.0.0
+
+# Git operations
+GitPython==3.1.40
+
+# Environment variables
+python-dotenv==1.0.0
+
+# AI - Google Gemini
+google-generativeai==0.8.3
+
+# AI - Anthropic Claude
+anthropic==0.34.0
+
+# Utility packages
+requests==2.31.0
+
+# Optional but recommended
+Werkzeug==3.0.1
