@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-# from services.git_service import GitService
+from services.git_service import GitService
 from services.ai_service import AIService
 import os
 from dotenv import load_dotenv
@@ -17,7 +17,7 @@ CORS(app)
 # Initialize services
 # GitService: Handles reading git repositories
 # AIService: Handles AI generation with Claude
-# git_service = GitService()
+git_service = GitService()
 ai_service = AIService()
 
 
