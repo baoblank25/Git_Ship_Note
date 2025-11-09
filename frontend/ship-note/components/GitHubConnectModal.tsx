@@ -1,10 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Github, GitBranch, Calendar, Loader2, Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { toast } from "sonner";
+import {
+  initiateGitHubOAuth,
+  isGitHubConnected,
+  getUserInfo,
+  disconnectGitHub,
+} from "@/lib/github";
 
 interface Repository {
   id: string;
@@ -32,10 +38,19 @@ export function GitHubConnectModal({
   isConnected,
   onFetchCommits,
 }: GitHubConnectModalProps) {
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [selectedRepo, setSelectedRepo] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState("2-weeks");
   const [isFetching, setIsFetching] = useState(false);
+
+  // Check if user is connected on component mount
+  useEffect(() => {
+    if (isOpen && isGitHubConnected() && !isConnected) {
+      const userInfo = getUserInfo();
+      if (userInfo) {
+        onConnect(userInfo.username);
+      }
+    }
+  }, [isOpen, isConnected, onConnect]);
 
   // Mock repositories data
   const mockRepositories: Repository[] = [
@@ -73,17 +88,20 @@ export function GitHubConnectModal({
     },
   ];
 
-  const handleConnect = async () => {
-    setIsAuthenticating(true);
-    // Simulate OAuth flow
-    setTimeout(() => {
-      onConnect("yourname");
-      setIsAuthenticating(false);
-      toast.success("GitHub account connected!");
-    }, 1500);
+  const handleConnect = () => {
+    try {
+      // Redirect to GitHub OAuth - this will redirect user to GitHub
+      initiateGitHubOAuth();
+    } catch (error) {
+      console.error("OAuth initiation error:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to start GitHub OAuth"
+      );
+    }
   };
 
   const handleDisconnect = () => {
+    disconnectGitHub(); // Clear localStorage
     onDisconnect();
     setSelectedRepo(null);
     toast.success("GitHub account disconnected");
@@ -177,30 +195,17 @@ export function GitHubConnectModal({
                   history. We only request read-only access to your
                   repositories.
                 </p>
-                <Button
-                  onClick={handleConnect}
-                  disabled={isAuthenticating}
-                  className="w-full gap-2"
-                >
-                  {isAuthenticating ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Authenticating...
-                    </>
-                  ) : (
-                    <>
-                      <Github className="w-4 h-4" />
-                      Connect with GitHub
-                    </>
-                  )}
+                <Button onClick={handleConnect} className="w-full gap-2">
+                  <Github className="w-4 h-4" />
+                  Connect with GitHub
                 </Button>
               </div>
 
               <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-900 rounded-lg">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  <strong>Demo Mode:</strong> This is using mock GitHub
-                  authentication. Real OAuth integration requires a secure
-                  backend (e.g., Supabase) to handle tokens safely.
+                  <strong>Secure OAuth:</strong> This uses real GitHub OAuth
+                  authentication. You&apos;ll be redirected to GitHub to
+                  authorize ShipNote.
                 </p>
               </div>
             </div>

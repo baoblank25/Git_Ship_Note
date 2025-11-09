@@ -325,10 +325,10 @@ echo "4. Save to $OUTPUT_FILE"
                     <div className="p-2 bg-blue-500/10 rounded-lg">
                       <Terminal className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <span>Input Git Logs</span>
+                    <span>Input Commits</span>
                   </CardTitle>
                   <CardDescription className="dark:text-slate-400">
-                    Paste your git log output or connect GitHub to auto-fetch
+                    Paste git commits or connect GitHub to auto-fetch
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 pt-6">
@@ -357,12 +357,11 @@ echo "4. Save to $OUTPUT_FILE"
                   <Textarea
                     value={gitLog}
                     onChange={(e) => setGitLog(e.target.value)}
-                    placeholder="Paste your git logs here (one commit per line):
+                    placeholder="Paste your git commits here, one per line:
 
-a83b1c9 feat: add real-time collaboration support
-f2e4d8a fix: resolve authentication timeout issue  
-c9b7f3e perf: optimize image loading with lazy loading
-d1a6e4f docs: update API documentation
+feat: add real-time collaboration
+fix: resolve authentication timeout
+perf: optimize image loading
 ..."
                     className="min-h-[320px] font-mono text-sm bg-slate-50 dark:bg-slate-950 border-2 rounded-xl focus:outline-none transition-all"
                   />
