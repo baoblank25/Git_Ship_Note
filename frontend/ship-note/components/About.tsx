@@ -35,8 +35,7 @@ export function About() {
             <p>
               Developer-focused git commit messages like{" "}
               <code className="bg-blue-100 dark:bg-blue-950 px-3 py-1 rounded-lg text-sm text-blue-700 dark:text-blue-300">
-                fix(db): resolve n+1 query in user_model
-                refs #156
+                fix(db): resolve n+1 query in user_model refs #156
               </code>{" "}
               are essential for technical teams but meaningless to end users.
               When it&apos;s time to write release notes or communicate updates,
@@ -109,8 +108,8 @@ export function About() {
                 3. Get Changelog
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Receive cleanly formatted, ready
-                to share information that your users can read via release notes, documentation, or
+                Receive cleanly formatted, ready to share information that your
+                users can read via release notes, documentation, or
                 announcements.
               </p>
             </CardContent>
@@ -270,7 +269,7 @@ export function About() {
           </h2>
           <div className="flex flex-wrap gap-3 justify-center">
             {[
-              { name: "React", color: "from-cyan-500 to-blue-500" },
+              { name: "Next.js", color: "from-slate-800 to-slate-950" },
               { name: "TypeScript", color: "from-blue-600 to-blue-700" },
               { name: "Tailwind CSS", color: "from-sky-500 to-cyan-500" },
               { name: "Claude AI", color: "from-amber-600 to-orange-700" },
