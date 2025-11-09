@@ -25,7 +25,7 @@ ai_service = AIService()
 @app.route('/health', methods=['GET'])
 def health_check():
     """
-    The CORE endpoint of GitScribe!
+    The CORE endpoint of ShipNote!
     
     This endpoint takes a list of commits and generates a clean, categorized changelog.
     

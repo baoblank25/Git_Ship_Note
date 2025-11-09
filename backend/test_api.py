@@ -1,9 +1,9 @@
 """
-Test script for GitScribe API
+Test script for ShipNote API
 ==============================
 Run this while app.py is running in another terminal
 
-This script tests all the main endpoints of your GitScribe backend.
+This script tests all the main endpoints of your ShipNote backend.
 """
 
 import requests
@@ -200,7 +200,7 @@ def test_error_handling():
 
 def main():
     """Run all tests"""
-    print_header("🚀 GitScribe API Test Suite")
+    print_header("🚀 ShipNote API Test Suite")
     print("\n📋 Make sure the following is running:")
     print("   Terminal 1: python app.py")
     print("   API URL: http://localhost:5000")
