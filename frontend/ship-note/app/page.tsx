@@ -357,13 +357,13 @@ echo "4. Save to $OUTPUT_FILE"
                   <Textarea
                     value={gitLog}
                     onChange={(e) => setGitLog(e.target.value)}
-                    placeholder="Paste your git logs here (one commit per line):
+                    placeholder={`Paste your git logs here (one commit per line):
 
 a83b1c9 feat: add real-time collaboration support
 f2e4d8a fix: resolve authentication timeout issue  
 c9b7f3e perf: optimize image loading with lazy loading
 d1a6e4f docs: update API documentation
-..."
+...`}
                     className="min-h-[320px] font-mono text-sm bg-slate-50 dark:bg-slate-950 border-2 rounded-xl focus:outline-none transition-all"
                   />
                   <div className="flex gap-2 flex-wrap">
