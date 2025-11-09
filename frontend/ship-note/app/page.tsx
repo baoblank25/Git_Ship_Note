@@ -107,15 +107,31 @@ export default function Page() {
     setChangelog("");
   };
 
-  const exampleCommits = `feat: add real-time collaboration support for team workspaces
-feat: implement dark mode with system preference detection
-fix: resolve authentication timeout issue on slow connections
-fix: correct date formatting in export functionality
-perf: optimize image loading with lazy loading and WebP format
-perf: reduce initial bundle size by 40% through code splitting
-feat: add keyboard shortcuts for power users
-fix: prevent duplicate form submissions on double-click
-feat: introduce customizable dashboard widgets`;
+  const exampleCommits = `feat(api): add new endpoint for user preferences
+BREAKING CHANGE: new response format requires client update
+
+fix(auth): ensure proper token refresh on session timeout
+refs #123
+
+style(ui): improve button hover states and focus rings
+- Update primary button gradients
+- Add keyboard focus styles
+
+chore(deps): bump typescript from 4.9.4 to 4.9.5
+
+build(docker): optimize image size and build time
+- Use multi-stage builds
+- Add layer caching
+
+test(api): add integration tests for auth flow
+Closes #456
+
+refactor(core): simplify state management logic
+Co-authored-by: Jane Doe <jane@example.com>
+
+docs(readme): update installation steps
+- Add development setup guide
+- Include troubleshooting section`;
 
   const handleUseExample = () => {
     setGitLog(exampleCommits);
@@ -559,13 +575,19 @@ d1a6e4f docs: update API documentation
                       </h3>
                       <ul className="text-slate-600 dark:text-slate-400 text-sm space-y-2 leading-relaxed">
                         <li>
-                          • Use conventional commits (feat:, fix:, perf:) for
-                          better categorization
+                          • Follow conventional commits format:
+                          <br />
+                          <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">type(scope): description</code>
+                          <br />
+                          <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">BREAKING CHANGE: description</code>
                         </li>
-                        <li>• Connect GitHub for automatic commit fetching</li>
                         <li>
-                          • Review and edit generated changelogs before
-                          publishing
+                          • Add detailed body and reference issues with keywords:
+                          <br />
+                          <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">refs #123</code> or <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">Closes #456</code>
+                        </li>
+                        <li>
+                          • Common types: feat, fix, docs, style, refactor, test, chore, build
                         </li>
                       </ul>
                     </div>

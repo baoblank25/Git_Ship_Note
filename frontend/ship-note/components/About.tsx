@@ -35,7 +35,8 @@ export function About() {
             <p>
               Developer-focused git commit messages like{" "}
               <code className="bg-blue-100 dark:bg-blue-950 px-3 py-1 rounded-lg text-sm text-blue-700 dark:text-blue-300">
-                fix: (db) resolve n+1 query on user_model
+                fix(db): resolve n+1 query in user_model
+                refs #156
               </code>{" "}
               are essential for technical teams but meaningless to end users.
               When it&apos;s time to write release notes or communicate updates,
