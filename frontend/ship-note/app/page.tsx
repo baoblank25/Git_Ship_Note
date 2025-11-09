@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import { GitHubConnectModal } from "@/components/GitHubConnectModal";
 import { About } from "@/components/About";
 import { generateFromText, checkHealth, generateFromGitHub } from "@/lib/api";
-import { getAccessToken, isValidGitHubUrl } from "@/lib/github";
+import { getAccessToken, isValidGitHubUrl, isGitHubConnected as checkGitHubConnection, getUserInfo } from "@/lib/github";
 import { Input } from "@/components/ui/input";
 
 export default function Page() {
@@ -59,6 +59,18 @@ export default function Page() {
       localStorage.setItem("shipnote-theme", "light");
     }
   }, [isDarkMode]);
+
+  // Check for existing GitHub connection on mount
+  useEffect(() => {
+    if (checkGitHubConnection()) {
+      const userInfo = getUserInfo();
+      if (userInfo && userInfo.username) {
+        setIsGitHubConnected(true);
+        setGithubUsername(userInfo.username);
+        console.log("✅ GitHub connection restored:", userInfo.username);
+      }
+    }
+  }, []);
 
   // Check backend health on component mount
   useEffect(() => {
