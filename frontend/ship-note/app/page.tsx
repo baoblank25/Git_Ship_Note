@@ -387,11 +387,6 @@ echo "4. Save to $OUTPUT_FILE"
           {/* Hero Section for Home */}
           {currentPage === "home" && (
             <div className="text-center mt-16 mb-12 animate-slide-up">
-              <div className="inline-block mb-4 px-4 py-2 bg-blue-500/10 dark:bg-blue-500/20 rounded-full border border-blue-500/20">
-                <span className="text-sm text-blue-600 dark:text-blue-400">
-                  ✨ AI-Powered Changelog Generation
-                </span>
-              </div>
               <h2 className="text-4xl md:text-5xl lg:text-6xl mb-6 bg-gradient-to-r from-slate-900 via-blue-800 to-slate-900 dark:from-slate-100 dark:via-blue-200 dark:to-slate-100 bg-clip-text text-transparent leading-tight">
                 Transform Commits Into
                 <br />
