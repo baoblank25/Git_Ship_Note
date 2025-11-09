@@ -272,8 +272,8 @@ export function About() {
               { name: "React", color: "from-cyan-500 to-blue-500" },
               { name: "TypeScript", color: "from-blue-600 to-blue-700" },
               { name: "Tailwind CSS", color: "from-sky-500 to-cyan-500" },
-              { name: "Claude AI", color: "from-purple-500 to-purple-600" },
-              { name: "Lucide Icons", color: "from-orange-500 to-red-500" },
+              { name: "Claude AI", color: "from-amber-600 to-orange-700" },
+              { name: "Lucide Icons", color: "from-purple-500 to-purple-600" },
               { name: "GitHub API", color: "from-slate-600 to-slate-700" },
             ].map((tech) => (
               <span
@@ -307,7 +307,7 @@ export function About() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card hover-lift rounded-2xl border-2 overflow-hidden bg-gradient-to-br from-purple-50 to-white dark:from-purple-950/20 dark:to-slate-800">
+        <Card className="glass-card hover-lift rounded-2xl border-2 overflow-hidden bg-gradient-to-br from-amber-100 via-orange-100 to-white dark:from-amber-900/40 dark:via-orange-900/30 dark:to-slate-800">
           <CardContent className="pt-8 p-6">
             <div className="flex items-center gap-4 mb-4">
               <div className="p-3 bg-white dark:bg-slate-800 rounded-xl shadow-lg">
