@@ -16,7 +16,7 @@ API_URL = os.getenv("GITSCRIBE_API", "http://localhost:5000")
 
 def clone_repo(git_url, depth=100):
     temp_dir = tempfile.mkdtemp(prefix="gitscribe_repo_")
-    console.print(f"🔄 Cloning repository (last {depth} commits)...")
+    console.print(f"Cloning repository (last {depth} commits)...")
     result = subprocess.run(
         ["git", "clone", "--depth", str(depth), git_url, temp_dir],
         stdout=subprocess.PIPE,
@@ -24,14 +24,14 @@ def clone_repo(git_url, depth=100):
         text=True,
     )
     if result.returncode != 0:
-        console.print(f"❌ Git clone failed:\n{result.stderr}")
+        console.print(f"Git clone failed:\n{result.stderr}")
         remove_readonly_and_delete(temp_dir)
         sys.exit(1)
-    console.print("✅ Repository cloned successfully")
+    console.print("Repository cloned successfully")
     return temp_dir
 
 def get_raw_git_log(repo_path, limit=100):
-    console.print(f"📖 Reading up to last {limit} commits...")
+    console.print(f"Reading up to last {limit} commits...")
     
     # Get commit info with files changed
     cmd = [
@@ -42,18 +42,18 @@ def get_raw_git_log(repo_path, limit=100):
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
-        console.print("❌ Failed to get git log")
+        console.print("Failed to get git log")
         sys.exit(1)
     
     # Count actual commits retrieved
     commits = [line for line in result.stdout.strip().split('\n') if '|' in line]
     actual_count = len(commits)
     
-    console.print(f"✅ {actual_count} commit{'s' if actual_count != 1 else ''} extracted")
+    console.print(f"{actual_count} commit{'s' if actual_count != 1 else ''} extracted")
     return result.stdout.strip(), actual_count
 
 def generate_changelog(raw_log, api_url):
-    console.print("🤖 Sending commit data to AI backend for changelog generation...")
+    console.print("Sending commit data to AI backend for changelog generation...")
     try:
         response = requests.post(
             url=f"{api_url}/api/generate-from-text",
@@ -61,19 +61,19 @@ def generate_changelog(raw_log, api_url):
             timeout=90
         )
     except requests.RequestException as e:
-        console.print(f"❌ Failed to reach backend API: {e}")
+        console.print(f"Failed to reach backend API: {e}")
         sys.exit(1)
 
     if response.status_code == 200:
         data = response.json()
         if data.get("success"):
-            console.print("✅ Changelog generated successfully!\n")
+            console.print("Changelog generated successfully!\n")
             return data.get("notes")
         else:
-            console.print(f"❌ API error: {data.get('error')}")
+            console.print(f"API error: {data.get('error')}")
             sys.exit(1)
     else:
-        console.print(f"❌ Request failed with status code {response.status_code}")
+        console.print(f"Request failed with status code {response.status_code}")
         sys.exit(1)
 
 def remove_readonly(func, path, excinfo):
@@ -176,7 +176,7 @@ def save_to_temp_markdown(changelog_text, commit_count):
         tmp.write(markdown_content)
         filepath = tmp.name
     
-    console.print(f"[green]✅ Changelog saved to temporary file: {filepath}[/green]")
+    console.print(f"[green]Changelog saved to temporary file: {filepath}[/green]")
     console.print("[blue]Opening file...[/blue]")
     
     # Open the file in default editor or VS Code
@@ -228,7 +228,7 @@ def main():
     if not git_url:
         git_url = console.input("Enter GitHub repository URL: ").strip()
         if not git_url:
-            console.print("❌ GitHub repository URL is required!")
+            console.print("GitHub repository URL is required!")
             sys.exit(1)
 
     # Get commit count from user if not provided via CLI arg
@@ -249,10 +249,10 @@ def main():
             
     finally:
         if not args.keep_temp:
-            console.print("🧹 Cleaning up temporary repository clone...")
+            console.print("Cleaning up temporary repository clone...")
             remove_readonly_and_delete(repo_path)
         else:
-            console.print(f"📁 Temporary repository kept at: {repo_path}")
+            console.print(f"Temporary repository kept at: {repo_path}")
 
 if __name__ == "__main__":
     main()
