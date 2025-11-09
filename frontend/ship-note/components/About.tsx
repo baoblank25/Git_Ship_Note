@@ -10,7 +10,7 @@ export function About() {
       <div className="text-center space-y-6 animate-slide-up">
         <div className="inline-block px-4 py-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 rounded-full border border-blue-500/20">
           <span className="text-sm text-blue-600 dark:text-blue-400">
-            About GitScribe
+            About ShipNote
           </span>
         </div>
         <h2 className="text-3xl md:text-4xl bg-gradient-to-r from-slate-900 via-blue-800 to-slate-900 dark:from-slate-100 dark:via-blue-200 dark:to-slate-100 bg-clip-text text-transparent">
@@ -24,7 +24,7 @@ export function About() {
         </p>
       </div>
 
-      {/* About GitScribe - Combined Problem & Vision */}
+      {/* About ShipNote - Combined Problem & Vision */}
       <Card className="glass-card rounded-2xl border-2 overflow-hidden">
         <CardContent className="pt-8 p-8">
           <h2 className="text-slate-900 dark:text-slate-100 mb-6 text-2xl">
@@ -42,7 +42,7 @@ export function About() {
               technical messages into user-friendly language.
             </p>
             <p>
-              GitScribe aims to be the go-to tool for developers who want to
+              ShipNote aims to be the go-to tool for developers who want to
               maintain transparency with their users without sacrificing
               development time. We believe that every software release deserves
               beautiful, understandable release notes—and that creating them
@@ -50,11 +50,11 @@ export function About() {
             </p>
             <p className="text-slate-700 dark:text-slate-300">
               By combining the power of AI with seamless Git integration,
-              GitScribe automatically transforms your raw git logs into
-              polished, categorized &quot;What&apos;s New&quot; changelogs that
-              your users will actually understand and appreciate, making it
-              easier than ever to bridge the gap between technical development
-              and user communication.
+              ShipNote automatically transforms your raw git logs into polished,
+              categorized &quot;What&apos;s New&quot; changelogs that your users
+              will actually understand and appreciate, making it easier than
+              ever to bridge the gap between technical development and user
+              communication.
             </p>
           </div>
         </CardContent>
@@ -299,7 +299,7 @@ export function About() {
               </h3>
             </div>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              GitScribe leverages the GitHub API to seamlessly connect to your
+              ShipNote leverages the GitHub API to seamlessly connect to your
               repositories and pull commit history, making changelog generation
               effortless.
             </p>

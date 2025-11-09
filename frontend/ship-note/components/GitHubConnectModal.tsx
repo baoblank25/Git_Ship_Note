@@ -173,8 +173,8 @@ export function GitHubConnectModal({
                   Connect Your GitHub Account
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
-                  Authorize GitScribe to access your repositories and pull
-                  commit history. We only request read-only access to your
+                  Authorize ShipNote to access your repositories and pull commit
+                  history. We only request read-only access to your
                   repositories.
                 </p>
                 <Button

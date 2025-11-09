@@ -1,14 +1,22 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { Toaster } from '../components/ui/sonner';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { Toaster } from "../components/ui/sonner";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'GitScribe - Transform Commits Into Beautiful Changelogs',
-  description: 'GitScribe converts technical git commits into user-friendly release notes in seconds. Perfect for developers, product managers, and technical writers.',
-  keywords: ['git', 'changelog', 'release notes', 'AI', 'Claude', 'developer tools'],
+  title: "ShipNote - Transform Commits Into Beautiful Changelogs",
+  description:
+    "ShipNote converts technical git commits into user-friendly release notes in seconds. Perfect for developers, product managers, and technical writers.",
+  keywords: [
+    "git",
+    "changelog",
+    "release notes",
+    "AI",
+    "Claude",
+    "developer tools",
+  ],
 };
 
 export default function RootLayout({

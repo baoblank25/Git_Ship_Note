@@ -1,5 +1,5 @@
 """
-Services package for GitScribe backend
+Services package for ShipNote backend
 """
 
 from .git_service import GitService
