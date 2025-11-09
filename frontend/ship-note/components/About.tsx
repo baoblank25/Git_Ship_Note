@@ -1,13 +1,6 @@
-import {
-  GitBranch,
-  Sparkles,
-  Github,
-  Terminal,
-  Zap,
-  Shield,
-  Clock,
-  Code,
-} from "lucide-react";
+"use client";
+
+import { Sparkles, Github, Terminal, Zap, Clock, Code } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 
 export function About() {
@@ -44,7 +37,7 @@ export function About() {
                 fix: (db) resolve n+1 query on user_model
               </code>{" "}
               are essential for technical teams but meaningless to end users.
-              When its time to write release notes or communicate updates,
+              When it&apos;s time to write release notes or communicate updates,
               developers spend valuable time manually translating these
               technical messages into user-friendly language.
             </p>
@@ -58,10 +51,10 @@ export function About() {
             <p className="text-slate-700 dark:text-slate-300">
               By combining the power of AI with seamless Git integration,
               GitScribe automatically transforms your raw git logs into
-              polished, categorized new changelogs that your users will
-              actually understand and appreciate, making it easier than ever to
-              bridge the gap between technical development and user
-              communication.
+              polished, categorized &quot;What&apos;s New&quot; changelogs that
+              your users will actually understand and appreciate, making it
+              easier than ever to bridge the gap between technical development
+              and user communication.
             </p>
           </div>
         </CardContent>
@@ -233,8 +226,9 @@ export function About() {
                   Product Updates
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Create new announcements for mobile apps, web apps,
-                  or SaaS products that users actually want to read.
+                  Create &quot;What&apos;s New&quot; announcements for mobile
+                  apps, web apps, or SaaS products that users actually want to
+                  read.
                 </p>
               </div>
             </div>
@@ -316,7 +310,7 @@ export function About() {
           <CardContent className="pt-8 p-6">
             <div className="flex items-center gap-4 mb-4">
               <div className="p-3 bg-white dark:bg-slate-800 rounded-xl shadow-lg">
-                <Sparkles className="w-10 h-10 text-purple-600 dark:text-purple-400" />
+                <Sparkles className="w-10 h-10 text-purple-600" />
               </div>
               <h3 className="text-slate-900 dark:text-slate-100 text-xl">
                 Powered by Claude

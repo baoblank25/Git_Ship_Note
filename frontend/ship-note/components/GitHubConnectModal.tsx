@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+"use client";
+
+import { useState } from "react";
 import { X, Github, GitBranch, Calendar, Loader2, Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
