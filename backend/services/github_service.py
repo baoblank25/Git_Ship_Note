@@ -183,10 +183,24 @@ class GitHubService:
             commits = []
             for commit in commits_data:
                 commit_obj = commit.get("commit", {})
+                
+                # Try to get author name from multiple sources
+                author_name = "Unknown"
+                
+                # First try: GitHub user (authenticated author)
+                if commit.get("author") and commit["author"].get("login"):
+                    author_name = commit["author"]["login"]
+                # Second try: Git commit author name
+                elif commit_obj.get("author") and commit_obj["author"].get("name"):
+                    author_name = commit_obj["author"]["name"]
+                # Third try: Committer if author not available
+                elif commit_obj.get("committer") and commit_obj["committer"].get("name"):
+                    author_name = commit_obj["committer"]["name"]
+                
                 commits.append({
                     "hash": commit["sha"][:7],  # Short hash
                     "message": commit_obj.get("message", ""),
-                    "author": commit_obj.get("author", {}).get("name", "Unknown"),
+                    "author": author_name,
                     "date": commit_obj.get("author", {}).get("date", ""),
                     "url": commit.get("html_url", "")
                 })

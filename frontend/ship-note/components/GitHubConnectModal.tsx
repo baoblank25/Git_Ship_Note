@@ -167,9 +167,9 @@ export function GitHubConnectModal({
       );
 
       if (response.success && response.commits) {
-        // Format commits for display
+        // Format commits for display with author information
         const formattedCommits = response.commits
-          .map((commit) => commit.message)
+          .map((commit) => `${commit.message} (by ${commit.author})`)
           .join("\n");
 
         onFetchCommits(formattedCommits);

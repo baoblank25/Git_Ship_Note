@@ -388,28 +388,40 @@ export async function generateFromGitHub(
   until?: string,
   limit?: number
 ): Promise<GenerateFromGitHubResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/github/generate-from-url`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      access_token: accessToken,
-      repo_url: repoUrl,
-      since,
-      until,
-      limit,
-    }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response
-      .json()
-      .catch(() => ({ error: "Failed to generate from GitHub" }));
-    throw new Error(
-      errorData.error || `HTTP error! status: ${response.status}`
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/github/generate-from-url`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          access_token: accessToken,
+          repo_url: repoUrl,
+          since,
+          until,
+          limit,
+        }),
+      }
     );
-  }
 
-  return response.json();
+    if (!response.ok) {
+      const errorData = await response
+        .json()
+        .catch(() => ({ error: "Failed to generate from GitHub" }));
+      throw new Error(
+        errorData.error || `HTTP error! status: ${response.status}`
+      );
+    }
+
+    return response.json();
+  } catch (error) {
+    if (error instanceof TypeError && error.message === "Failed to fetch") {
+      throw new Error(
+        "Could not connect to backend server. Please ensure the Flask server is running on port 5000."
+      );
+    }
+    throw error;
+  }
 }
