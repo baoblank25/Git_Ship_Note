@@ -109,8 +109,8 @@ export function About() {
                 3. Get Changelog
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Receive a beautifully formatted, emoji-enhanced changelog ready
-                to share with your users in release notes, documentation, or
+                Receive cleanly formatted, ready
+                to share information that your users can read via release notes, documentation, or
                 announcements.
               </p>
             </CardContent>
