@@ -10,16 +10,13 @@ import {
   isGitHubConnected,
   getUserInfo,
   disconnectGitHub,
+  getAccessToken,
 } from "@/lib/github";
-
-interface Repository {
-  id: string;
-  name: string;
-  fullName: string;
-  description: string;
-  stars: number;
-  lastCommit: string;
-}
+import {
+  getGitHubRepositories,
+  GitHubRepository,
+  fetchGitHubCommits,
+} from "@/lib/api";
 
 interface GitHubConnectModalProps {
   isOpen: boolean;
@@ -38,9 +35,12 @@ export function GitHubConnectModal({
   isConnected,
   onFetchCommits,
 }: GitHubConnectModalProps) {
-  const [selectedRepo, setSelectedRepo] = useState<string | null>(null);
+  const [selectedRepo, setSelectedRepo] = useState<number | null>(null);
   const [dateRange, setDateRange] = useState("2-weeks");
   const [isFetching, setIsFetching] = useState(false);
+  const [repositories, setRepositories] = useState<GitHubRepository[]>([]);
+  const [isLoadingRepos, setIsLoadingRepos] = useState(false);
+  const [username, setUsername] = useState("");
 
   // Check if user is connected on component mount
   useEffect(() => {
@@ -52,41 +52,44 @@ export function GitHubConnectModal({
     }
   }, [isOpen, isConnected, onConnect]);
 
-  // Mock repositories data
-  const mockRepositories: Repository[] = [
-    {
-      id: "1",
-      name: "awesome-app",
-      fullName: "yourname/awesome-app",
-      description: "A full-stack web application built with React and Node.js",
-      stars: 142,
-      lastCommit: "2 hours ago",
-    },
-    {
-      id: "2",
-      name: "design-system",
-      fullName: "yourname/design-system",
-      description: "Reusable component library with Tailwind CSS",
-      stars: 89,
-      lastCommit: "1 day ago",
-    },
-    {
-      id: "3",
-      name: "api-gateway",
-      fullName: "yourname/api-gateway",
-      description: "Microservices API gateway with authentication",
-      stars: 56,
-      lastCommit: "3 days ago",
-    },
-    {
-      id: "4",
-      name: "ml-pipeline",
-      fullName: "yourname/ml-pipeline",
-      description: "Machine learning data processing pipeline",
-      stars: 34,
-      lastCommit: "1 week ago",
-    },
-  ];
+  // Fetch repositories when modal opens and user is connected
+  useEffect(() => {
+    const fetchRepositories = async () => {
+      if (isOpen && isConnected) {
+        const userInfo = getUserInfo();
+        if (userInfo) {
+          setUsername(userInfo.username);
+        }
+
+        const accessToken = getAccessToken();
+        if (!accessToken) {
+          toast.error("Access token not found. Please reconnect.");
+          return;
+        }
+
+        setIsLoadingRepos(true);
+        try {
+          const response = await getGitHubRepositories(accessToken);
+          if (response.success && response.repositories) {
+            setRepositories(response.repositories);
+          } else {
+            throw new Error(response.error || "Failed to fetch repositories");
+          }
+        } catch (error) {
+          console.error("Error fetching repositories:", error);
+          toast.error(
+            error instanceof Error
+              ? error.message
+              : "Failed to fetch repositories"
+          );
+        } finally {
+          setIsLoadingRepos(false);
+        }
+      }
+    };
+
+    fetchRepositories();
+  }, [isOpen, isConnected]);
 
   const handleConnect = () => {
     try {
@@ -104,6 +107,8 @@ export function GitHubConnectModal({
     disconnectGitHub(); // Clear localStorage
     onDisconnect();
     setSelectedRepo(null);
+    setRepositories([]);
+    setUsername("");
     toast.success("GitHub account disconnected");
   };
 
@@ -113,45 +118,75 @@ export function GitHubConnectModal({
       return;
     }
 
-    setIsFetching(true);
-
-    // Simulate fetching commits from GitHub
-    setTimeout(() => {
-      const mockCommits = generateMockCommits(dateRange);
-      onFetchCommits(mockCommits);
-      setIsFetching(false);
-    }, 1000);
-  };
-
-  const generateMockCommits = (range: string): string => {
-    const commits = [
-      "feat: (ui) add dark mode support with theme toggle",
-      "fix: (auth) resolve session timeout on mobile devices",
-      "perf: optimize image loading with lazy loading",
-      "feat: (api) implement rate limiting middleware",
-      "fix: (db) resolve n+1 query issue in user profiles",
-      "docs: update API documentation with new endpoints",
-      "refactor: extract common validation logic",
-      "feat: (dashboard) add analytics charts with recharts",
-      "fix: (forms) prevent double submission on slow connections",
-      "perf: reduce bundle size by 25% with code splitting",
-      "feat: (notifications) add real-time push notifications",
-      "fix: (ui) correct mobile menu overlay z-index",
-      "test: add integration tests for authentication flow",
-      "chore: upgrade dependencies to latest versions",
-      "feat: (search) implement advanced filtering options",
-    ];
-
-    // Return different subsets based on date range
-    if (range === "1-week") {
-      return commits.slice(0, 8).join("\n");
-    } else if (range === "2-weeks") {
-      return commits.slice(0, 12).join("\n");
-    } else if (range === "1-month") {
-      return commits.join("\n");
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      toast.error("Access token not found. Please reconnect.");
+      return;
     }
 
-    return commits.slice(0, 12).join("\n");
+    // Find the selected repository
+    const repo = repositories.find((r) => r.id === selectedRepo);
+    if (!repo) {
+      toast.error("Repository not found");
+      return;
+    }
+
+    // Parse owner and repo name from full_name
+    const [owner, repoName] = repo.full_name.split("/");
+
+    setIsFetching(true);
+
+    try {
+      // Calculate date range
+      let since: string | undefined;
+      const now = new Date();
+
+      if (dateRange === "1-week") {
+        const oneWeekAgo = new Date(now);
+        oneWeekAgo.setDate(now.getDate() - 7);
+        since = oneWeekAgo.toISOString();
+      } else if (dateRange === "2-weeks") {
+        const twoWeeksAgo = new Date(now);
+        twoWeeksAgo.setDate(now.getDate() - 14);
+        since = twoWeeksAgo.toISOString();
+      } else if (dateRange === "1-month") {
+        const oneMonthAgo = new Date(now);
+        oneMonthAgo.setMonth(now.getMonth() - 1);
+        since = oneMonthAgo.toISOString();
+      }
+      // For "all", since remains undefined
+
+      // Fetch commits from GitHub
+      const response = await fetchGitHubCommits(
+        accessToken,
+        owner,
+        repoName,
+        since,
+        undefined, // until (optional)
+        dateRange === "all" ? 1000 : 100 // Higher limit for all commits
+      );
+
+      if (response.success && response.commits) {
+        // Format commits for display
+        const formattedCommits = response.commits
+          .map((commit) => commit.message)
+          .join("\n");
+
+        onFetchCommits(formattedCommits);
+        toast.success(
+          `Fetched ${response.commits.length} commits from ${repo.name}`
+        );
+      } else {
+        throw new Error(response.error || "Failed to fetch commits");
+      }
+    } catch (error) {
+      console.error("Error fetching commits:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to fetch commits"
+      );
+    } finally {
+      setIsFetching(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -216,7 +251,7 @@ export function GitHubConnectModal({
                 <Check className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
                 <div className="flex-1">
                   <h3 className="text-green-900 dark:text-green-100 mb-1">
-                    Connected as yourname
+                    Connected as {username || "user"}
                   </h3>
                   <p className="text-sm text-green-800 dark:text-green-200">
                     You can now pull commits from your repositories
@@ -232,43 +267,54 @@ export function GitHubConnectModal({
                 <label className="block text-sm text-slate-700 dark:text-slate-300 mb-2">
                   Select Repository
                 </label>
-                <div className="grid gap-2">
-                  {mockRepositories.map((repo) => (
-                    <button
-                      key={repo.id}
-                      onClick={() => setSelectedRepo(repo.id)}
-                      className={`p-4 text-left border rounded-lg transition-all ${
-                        selectedRepo === repo.id
-                          ? "border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-500"
-                          : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-900"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <GitBranch className="w-4 h-4 text-slate-600 dark:text-slate-400" />
-                            <span className="text-slate-900 dark:text-slate-100">
-                              {repo.fullName}
-                            </span>
+                {isLoadingRepos ? (
+                  <div className="flex items-center justify-center py-8 text-slate-500">
+                    <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                    <span>Loading repositories...</span>
+                  </div>
+                ) : repositories.length === 0 ? (
+                  <div className="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-center text-slate-600 dark:text-slate-400">
+                    No repositories found
+                  </div>
+                ) : (
+                  <div className="grid gap-2">
+                    {repositories.map((repo) => (
+                      <button
+                        key={repo.id}
+                        onClick={() => setSelectedRepo(repo.id)}
+                        className={`p-4 text-left border rounded-lg transition-all ${
+                          selectedRepo === repo.id
+                            ? "border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-500"
+                            : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-900"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <GitBranch className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                              <span className="text-slate-900 dark:text-slate-100">
+                                {repo.full_name}
+                              </span>
+                            </div>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                              {repo.description || "No description"}
+                            </p>
+                            <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-500">
+                              <span>⭐ {repo.stars}</span>
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {new Date(repo.updated_at).toLocaleDateString()}
+                              </span>
+                            </div>
                           </div>
-                          <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
-                            {repo.description}
-                          </p>
-                          <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-500">
-                            <span>⭐ {repo.stars}</span>
-                            <span className="flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
-                              {repo.lastCommit}
-                            </span>
-                          </div>
+                          {selectedRepo === repo.id && (
+                            <Check className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                          )}
                         </div>
-                        {selectedRepo === repo.id && (
-                          <Check className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                        )}
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Date Range Selection */}
@@ -276,7 +322,7 @@ export function GitHubConnectModal({
                 <label className="block text-sm text-slate-700 dark:text-slate-300 mb-2">
                   Commit Range
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-2 mb-2">
                   {[
                     { value: "1-week", label: "Last Week" },
                     { value: "2-weeks", label: "Last 2 Weeks" },
@@ -294,6 +340,18 @@ export function GitHubConnectModal({
                       {option.label}
                     </button>
                   ))}
+                </div>
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => setDateRange("all")}
+                    className={`p-3 text-sm rounded-lg border transition-all w-full max-w-xs ${
+                      dateRange === "all"
+                        ? "border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+                        : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600"
+                    }`}
+                  >
+                    All Commits
+                  </button>
                 </div>
               </div>
 
