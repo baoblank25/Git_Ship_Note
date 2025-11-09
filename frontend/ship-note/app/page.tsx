@@ -544,19 +544,32 @@ d1a6e4f docs: update API documentation
                       <h3 className="text-slate-900 dark:text-slate-100 mb-2">
                         Command Line Tool
                       </h3>
-                      <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 leading-relaxed">
-                        Extract commits directly from your local repository with
-                        our CLI tool. Works seamlessly with your existing git
-                        workflow.
-                      </p>
-                      <Button
-                        onClick={handleDownloadCLI}
-                        size="sm"
-                        className="gap-2 hover-lift bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white cursor-pointer"
-                      >
-                        <Download className="w-4 h-4" />
-                        Download CLI
-                      </Button>
+                      <div className="space-y-4">
+                        <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                          Extract commits directly from your local repository with
+                          our CLI tool. Works seamlessly with your existing git
+                          workflow.
+                        </p>
+                        <div className="pt-2">
+                          <Button
+                            onClick={handleDownloadCLI}
+                            size="sm"
+                            className="gap-2 hover-lift bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white cursor-pointer"
+                          >
+                            <Download className="w-4 h-4" />
+                            Download CLI
+                          </Button>
+                        </div>
+                        <a
+                          href="https://docs.github.com/en/github-cli/github-cli/quickstart"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+                        >
+                          <Github className="w-4 h-4" />
+                          GitHub CLI Quickstart Guide
+                        </a>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -573,23 +586,25 @@ d1a6e4f docs: update API documentation
                       <h3 className="text-slate-900 dark:text-slate-100 mb-2">
                         Pro Tips
                       </h3>
-                      <ul className="text-slate-600 dark:text-slate-400 text-sm space-y-2 leading-relaxed">
-                        <li>
-                          • Follow conventional commits format:
-                          <br />
-                          <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">type(scope): description</code>
-                          <br />
-                          <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">BREAKING CHANGE: description</code>
-                        </li>
-                        <li>
-                          • Add detailed body and reference issues with keywords:
-                          <br />
-                          <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">refs #123</code> or <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">Closes #456</code>
-                        </li>
-                        <li>
-                          • Common types: feat, fix, docs, style, refactor, test, chore, build
-                        </li>
-                      </ul>
+                      <div className="space-y-4">
+                        <ul className="text-slate-600 dark:text-slate-400 text-sm space-y-2 leading-relaxed">
+                          <li>
+                            • Follow conventional commits format:
+                            <br />
+                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">type(scope): description</code>
+                            <br />
+                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">BREAKING CHANGE: description</code>
+                          </li>
+                          <li>
+                            • Add detailed body and reference issues with keywords:
+                            <br />
+                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">refs #123</code> or <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">Closes #456</code>
+                          </li>
+                          <li>
+                            • Common types: feat, fix, docs, style, refactor, test, chore, build
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
