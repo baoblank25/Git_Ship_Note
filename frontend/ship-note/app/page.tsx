@@ -616,11 +616,10 @@ d1a6e4f docs: update API documentation
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t border-slate-200/50 dark:border-slate-700/50 text-center animate-fade-in">
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Built with ❤️ using Next.js, React, TypeScript, Tailwind CSS, and
-            Claude AI
+            2025 Claude Hackathon
           </p>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            © 2025 ShipNote. Transform commits into beautiful changelogs.
+            Developer Track
           </p>
         </footer>
       </div>
