@@ -27,7 +27,12 @@ import { toast } from "sonner";
 import { GitHubConnectModal } from "@/components/GitHubConnectModal";
 import { About } from "@/components/About";
 import { generateFromText, checkHealth, generateFromGitHub } from "@/lib/api";
-import { getAccessToken, isValidGitHubUrl, isGitHubConnected as checkGitHubConnection, getUserInfo } from "@/lib/github";
+import {
+  getAccessToken,
+  isValidGitHubUrl,
+  isGitHubConnected as checkGitHubConnection,
+  getUserInfo,
+} from "@/lib/github";
 import { Input } from "@/components/ui/input";
 
 export default function Page() {
