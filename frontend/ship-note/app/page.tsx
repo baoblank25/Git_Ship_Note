@@ -26,7 +26,14 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { GitHubConnectModal } from "@/components/GitHubConnectModal";
 import { About } from "@/components/About";
-import { generateFromText, checkHealth } from "@/lib/api";
+import { generateFromText, checkHealth, generateFromGitHub } from "@/lib/api";
+import {
+  getAccessToken,
+  isValidGitHubUrl,
+  isGitHubConnected as checkGitHubConnection,
+  getUserInfo,
+} from "@/lib/github";
+import { Input } from "@/components/ui/input";
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState<"home" | "about">("about");
@@ -37,6 +44,8 @@ export default function Page() {
   const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
   const [isGitHubConnected, setIsGitHubConnected] = useState(false);
   const [githubUsername, setGithubUsername] = useState("");
+  const [githubRepoUrl, setGithubRepoUrl] = useState("");
+  const [isGeneratingFromGitHub, setIsGeneratingFromGitHub] = useState(false);
 
   // Initialize and persist theme
   useEffect(() => {
@@ -55,6 +64,18 @@ export default function Page() {
       localStorage.setItem("shipnote-theme", "light");
     }
   }, [isDarkMode]);
+
+  // Check for existing GitHub connection on mount
+  useEffect(() => {
+    if (checkGitHubConnection()) {
+      const userInfo = getUserInfo();
+      if (userInfo && userInfo.username) {
+        setIsGitHubConnected(true);
+        setGithubUsername(userInfo.username);
+        console.log("✅ GitHub connection restored:", userInfo.username);
+      }
+    }
+  }, []);
 
   // Check backend health on component mount
   useEffect(() => {
@@ -136,6 +157,62 @@ docs(readme): update installation steps
   const handleUseExample = () => {
     setGitLog(exampleCommits);
     setChangelog("");
+  };
+
+  const handleGenerateFromGitHub = async () => {
+    if (!githubRepoUrl.trim()) {
+      toast.error("Please enter a GitHub repository URL");
+      return;
+    }
+
+    if (!isValidGitHubUrl(githubRepoUrl)) {
+      toast.error(
+        "Please enter a valid GitHub repository URL (e.g., https://github.com/owner/repo)"
+      );
+      return;
+    }
+
+    if (!isGitHubConnected) {
+      toast.error("Please connect your GitHub account first");
+      setIsGitHubModalOpen(true);
+      return;
+    }
+
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      toast.error(
+        "GitHub access token not found. Please reconnect your account."
+      );
+      setIsGitHubConnected(false);
+      return;
+    }
+
+    setIsGeneratingFromGitHub(true);
+    setChangelog("");
+
+    try {
+      const result = await generateFromGitHub(accessToken, githubRepoUrl);
+
+      if (result.success && result.notes) {
+        setChangelog(result.notes);
+        toast.success(
+          `Generated changelog from ${result.commit_count} commits!`
+        );
+      } else {
+        throw new Error(
+          result.error || "Failed to generate changelog from GitHub"
+        );
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to generate changelog from GitHub";
+      toast.error(errorMessage);
+      console.error("GitHub changelog generation error:", error);
+    } finally {
+      setIsGeneratingFromGitHub(false);
+    }
   };
 
   const handleDownloadCLI = () => {
@@ -333,18 +410,18 @@ echo "4. Save to $OUTPUT_FILE"
           <About />
         ) : (
           <>
-            <div className="grid lg:grid-cols-2 gap-8 animate-scale-in">
+            <div className="grid lg:grid-cols-2 gap-8 animate-scale-in items-start">
               {/* Input Section */}
-              <Card className="glass-card shadow-2xl rounded-2xl overflow-hidden border-2">
+              <Card className="glass-card shadow-2xl rounded-2xl overflow-hidden border-2 self-start">
                 <CardHeader className="bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-950/20 dark:to-transparent">
                   <CardTitle className="flex items-center gap-3 dark:text-slate-100">
                     <div className="p-2 bg-blue-500/10 rounded-lg">
                       <Terminal className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <span>Input Git Logs</span>
+                    <span>Input Commits</span>
                   </CardTitle>
                   <CardDescription className="dark:text-slate-400">
-                    Paste your git log output or connect GitHub to auto-fetch
+                    Paste git commits or connect GitHub to auto-fetch
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 pt-6">
@@ -417,11 +494,55 @@ d1a6e4f docs: update API documentation
                       Example
                     </Button>
                   </div>
+
+                  {/* GitHub Repository URL Section */}
+                  <Separator className="my-6" />
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                      <Github className="w-4 h-4" />
+                      Or fetch from GitHub Repository
+                    </label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={githubRepoUrl}
+                        onChange={(e) => setGithubRepoUrl(e.target.value)}
+                        placeholder="https://github.com/owner/repository"
+                        disabled={isGeneratingFromGitHub || !isGitHubConnected}
+                        className="flex-1 font-mono text-sm border-2 rounded-lg"
+                      />
+                      <Button
+                        onClick={handleGenerateFromGitHub}
+                        disabled={
+                          isGeneratingFromGitHub ||
+                          !githubRepoUrl.trim() ||
+                          !isGitHubConnected
+                        }
+                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 hover-lift"
+                      >
+                        {isGeneratingFromGitHub ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Fetching...
+                          </>
+                        ) : (
+                          <>
+                            <Github className="w-4 h-4 mr-2" />
+                            Generate
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    {!isGitHubConnected && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400">
+                        ⚠️ Connect your GitHub account above to use this feature
+                      </p>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
 
               {/* Output Section */}
-              <Card className="glass-card shadow-2xl rounded-2xl overflow-hidden border-2">
+              <Card className="glass-card shadow-2xl rounded-2xl overflow-hidden border-2 min-h-[740px]">
                 <CardHeader className="bg-gradient-to-br from-purple-50/50 to-transparent dark:from-purple-950/20 dark:to-transparent">
                   <CardTitle className="flex items-center gap-3 dark:text-slate-100">
                     <div className="p-2 bg-purple-500/10 rounded-lg">
@@ -433,13 +554,10 @@ d1a6e4f docs: update API documentation
                     User-friendly release notes ready to share
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="pt-6">
-                  {isGenerating ? (
+                <CardContent className="pt-6 pb-6">
+                  {isGenerating || isGeneratingFromGitHub ? (
                     <div className="flex flex-col items-center justify-center min-h-[320px] text-slate-400 dark:text-slate-500">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full"></div>
-                        <Loader2 className="w-12 h-12 animate-spin mb-4 relative text-blue-600 dark:text-blue-400" />
-                      </div>
+                      <Loader2 className="w-12 h-12 animate-spin mb-4 text-blue-600 dark:text-blue-400" />
                       <p className="animate-pulse">
                         Generating your changelog...
                       </p>
