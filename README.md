@@ -163,7 +163,7 @@ The frontend will start on http://localhost:3000
 
 ## Using the VS Code Extension
 
-GitHub Repo for the Extension: https://github.com/baoblank25/extension
+GitHub Repo of the Extension: https://github.com/baoblank25/extension
 
 ### Installation
 
@@ -270,4 +270,5 @@ For issues, questions, or suggestions:
 - Built with Claude AI by Anthropic
 - Uses Next.js, Flask, and GitPython
 - GitHub API integration for seamless repository access
+
 
