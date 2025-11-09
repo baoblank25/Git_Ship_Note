@@ -215,108 +215,6 @@ docs(readme): update installation steps
     }
   };
 
-  const handleDownloadCLI = () => {
-    const cliScript = `#!/bin/bash
-# ShipNote CLI - Changelog Generator
-# Usage: ./shipnote.sh [--since <commit-hash>] [--output <file>]
-
-set -e
-
-SINCE_COMMIT=""
-OUTPUT_FILE="CHANGELOG.md"
-
-# Parse arguments
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    --since)
-      SINCE_COMMIT="$2"
-      shift 2
-      ;;
-    --output)
-      OUTPUT_FILE="$2"
-      shift 2
-      ;;
-    --help)
-      echo "ShipNote CLI - Generate user-friendly changelogs from git commits"
-      echo ""
-      echo "Usage: ./shipnote.sh [OPTIONS]"
-      echo ""
-      echo "Options:"
-      echo "  --since <commit>    Generate changelog since this commit (default: last tag)"
-      echo "  --output <file>     Output file (default: CHANGELOG.md)"
-      echo "  --help             Show this help message"
-      exit 0
-      ;;
-    *)
-      echo "Unknown option: $1"
-      echo "Run './shipnote.sh --help' for usage information"
-      exit 1
-      ;;
-  esac
-done
-
-# Determine the starting point for the changelog
-if [ -z "$SINCE_COMMIT" ]; then
-  # Get the last tag
-  LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-  if [ -z "$LAST_TAG" ]; then
-    echo "No tags found. Generating changelog for all commits..."
-    SINCE_COMMIT=""
-  else
-    echo "Generating changelog since last tag: $LAST_TAG"
-    SINCE_COMMIT="$LAST_TAG"
-  fi
-fi
-
-# Get git log
-if [ -z "$SINCE_COMMIT" ]; then
-  GIT_LOG=$(git log --pretty=format:"%s" --no-merges)
-else
-  GIT_LOG=$(git log "$SINCE_COMMIT"..HEAD --pretty=format:"%s" --no-merges)
-fi
-
-if [ -z "$GIT_LOG" ]; then
-  echo "No commits found."
-  exit 1
-fi
-
-echo "Found $(echo "$GIT_LOG" | wc -l) commits"
-echo ""
-echo "Git commits:"
-echo "$GIT_LOG"
-echo ""
-echo "================================"
-echo ""
-echo "To generate an AI-powered changelog, visit:"
-echo "https://your-shipnote-url.com"
-echo ""
-echo "Or set up the ShipNote API integration:"
-echo "1. Install dependencies: npm install @anthropic-ai/sdk"
-echo "2. Set your ANTHROPIC_API_KEY environment variable"
-echo "3. Use the ShipNote API to generate the changelog"
-echo ""
-echo "Commits have been saved to: git-log.txt"
-echo "$GIT_LOG" > git-log.txt
-echo ""
-echo "Next steps:"
-echo "1. Copy the contents of git-log.txt"
-echo "2. Paste into ShipNote web interface"
-echo "3. Generate your changelog"
-echo "4. Save to $OUTPUT_FILE"
-`;
-
-    const blob = new Blob([cliScript], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "shipnote.sh";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success("CLI script downloaded! Run: chmod +x shipnote.sh");
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 transition-all duration-500">
       {/* Ambient background effects */}
@@ -664,28 +562,33 @@ d1a6e4f docs: update API documentation
                       </h3>
                       <div className="space-y-4">
                         <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                          Extract commits directly from your local repository with
-                          our CLI tool. Works seamlessly with your existing git
-                          workflow.
+                          Extract commits directly from your local repository
+                          with our CLI tool. Works seamlessly with your existing
+                          git workflow.
                         </p>
                         <div className="pt-2">
                           <Button
-                            onClick={handleDownloadCLI}
+                            onClick={() =>
+                              window.open(
+                                "https://marketplace.visualstudio.com/items?itemName=BrianBaoHoang.gitshipnote",
+                                "_blank"
+                              )
+                            }
                             size="sm"
                             className="gap-2 hover-lift bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white cursor-pointer"
                           >
                             <Download className="w-4 h-4" />
-                            Download CLI
+                            Download VS Code Extension
                           </Button>
                         </div>
                         <a
-                          href="https://docs.github.com/en/github-cli/github-cli/quickstart"
+                          href="https://github.com/baoblank25/Git_Ship_Note"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
                         >
                           <Github className="w-4 h-4" />
-                          GitHub CLI Quickstart Guide
+                          GitHub Quickstart Guide
                         </a>
                       </div>
                     </div>
@@ -709,17 +612,29 @@ d1a6e4f docs: update API documentation
                           <li>
                             • Follow conventional commits format:
                             <br />
-                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">type(scope): description</code>
+                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">
+                              type(scope): description
+                            </code>
                             <br />
-                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">BREAKING CHANGE: description</code>
+                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">
+                              BREAKING CHANGE: description
+                            </code>
                           </li>
                           <li>
-                            • Add detailed body and reference issues with keywords:
+                            • Add detailed body and reference issues with
+                            keywords:
                             <br />
-                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">refs #123</code> or <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">Closes #456</code>
+                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">
+                              refs #123
+                            </code>{" "}
+                            or{" "}
+                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">
+                              Closes #456
+                            </code>
                           </li>
                           <li>
-                            • Common types: feat, fix, docs, style, refactor, test, chore, build
+                            • Common types: feat, fix, docs, style, refactor,
+                            test, chore, build
                           </li>
                         </ul>
                       </div>
