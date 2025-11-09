@@ -17,6 +17,11 @@ export const metadata: Metadata = {
     "Claude",
     "developer tools",
   ],
+  icons: [
+    { rel: 'icon', url: '/images/ShipNote.jpg' },
+    { rel: 'apple-touch-icon', url: '/images/ShipNote.jpg' },
+  ],
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
@@ -26,6 +31,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/images/ShipNote.jpg" />
+        <link rel="apple-touch-icon" href="/images/ShipNote.jpg" />
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body className={inter.className}>
         {children}
         <Toaster position="top-center" />

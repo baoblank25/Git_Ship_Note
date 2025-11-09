@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   GitBranch,
   Sparkles,
@@ -330,8 +331,14 @@ echo "4. Save to $OUTPUT_FILE"
         <header className="mb-12 animate-fade-in">
           <nav className="glass-card rounded-2xl px-6 py-4 flex items-center justify-between shadow-lg">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg shadow-blue-500/20">
-                <GitBranch className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg shadow-blue-500/20 overflow-hidden">
+                <Image
+                  src="/images/ShipNoteCropped.jpg"
+                  alt="ShipNote Logo"
+                  width={80}
+                  height={80}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <h1 className="text-xl md:text-2xl bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent animate-gradient">
                 ShipNote
@@ -387,6 +394,11 @@ echo "4. Save to $OUTPUT_FILE"
           {/* Hero Section for Home */}
           {currentPage === "home" && (
             <div className="text-center mt-16 mb-12 animate-slide-up">
+              <div className="inline-block mb-4 px-4 py-2 bg-blue-500/10 dark:bg-blue-500/20 rounded-full border border-blue-500/20">
+                <span className="text-sm text-blue-600 dark:text-blue-400">
+                  ✨ AI-Powered Changelog Generation
+                </span>
+              </div>
               <h2 className="text-4xl md:text-5xl lg:text-6xl mb-6 bg-gradient-to-r from-slate-900 via-blue-800 to-slate-900 dark:from-slate-100 dark:via-blue-200 dark:to-slate-100 bg-clip-text text-transparent leading-tight">
                 Transform Commits Into
                 <br />
