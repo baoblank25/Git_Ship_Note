@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 class AIService:
     def __init__(self):
         self.api_key = os.getenv("ANTHROPIC_API_KEY")
@@ -48,59 +47,80 @@ class AIService:
             raise Exception(result['error'])
         
     def generate_changelog(self, git_log: str) -> Dict[str, Any]:
-        system_prompt = """You are a professional technical writer specializing in creating clean, user-friendly changelogs.
+        system_prompt = """You are a professional technical writer who creates simple, easy-to-read changelogs.
 
-Your task is to analyze git commit history and create a changelog that:
+Your task is to analyze git commits and create a changelog that anyone can understand:
 
-1. **Categorizes commits** into:
-   - Features: New functionality, capabilities, or additions
-   - Fixes: Bug fixes, error corrections, or patches
-   - Improvements: Enhancements, optimizations, or refactoring
-   - Documentation: Docs, README, or comment updates
-   - Other (vague commit message): Configuration, dependencies, or miscellaneous changes that lack clear description
+1. **Categorize commits** into:
+   - Features: New stuff added
+   - Fixes: Bugs that were fixed
+   - Improvements: Things that work better now
+   - Deletions: Things that were removed
+   - Documentation: Updates to docs or comments
+   - Other (vague commit message): Config changes or unclear updates
 
-2. **Filters out noise**:
+2. **Skip the noise**:
    - Ignore: merge commits, version bumps, "WIP" commits
-   - Ignore: trivial updates like "fix typo", "update .gitignore"
+   - Ignore: trivial stuff like "fix typo", "update .gitignore"
    - Ignore: developer-only changes that don't affect users
 
-3. **Writes clearly**:
-   - Use plain, non-technical language
-   - Focus on WHAT changed and WHY it matters to users
-   - Keep descriptions concise (1-2 lines max)
-   - Remove commit hashes and technical jargon
-   - Include the commit date/time next to each change
+3. **Write simply with file information**:
+   - Each item should be 1-2 lines with easy-to-understand language
+   - **Always mention which file(s) were changed, added, or deleted** (if available in the commit info)
+   - Format file mentions like: "in `filename.py`" or "to `folder/file.js`"
+   - Use simple, everyday words - avoid technical jargon
+   - Focus on WHAT changed in plain English
+   - For features: say what new thing was added and which files
+   - For fixes: say what problem was solved and which files were fixed
+   - For improvements: say what got better and which files were updated
+   - For deletions: say what was removed (files or features)
+   - Remove commit hashes
+   - **Always include the author name** from the commit
+   - Include the date and time
 
-4. **Formats in Markdown**:
-Features:
-Brief description of what was added (Nov 4, 10:00 AM)
+4. **Format with spacing**:
+## Features:
+- Added new login system in `auth.py` - by John Doe (Nov 4, 10:00 AM)
 
-Fixes:
-Brief description of what was fixed (Nov 3, 2:30 PM)
+- Created dark mode toggle in `settings.js` - by Jane Smith (Nov 4, 9:30 AM)
 
-Improvements:
-Brief description of what was improved (Nov 2, 4:15 PM)
+## Fixes:
+- Fixed password bug in `auth.py` - by John Doe (Nov 3, 2:30 PM)
 
-Documentation:
-Brief description of documentation changes (Nov 1, 9:00 AM)
+- Resolved crash in `app.js` - by Bob Johnson (Nov 3, 1:15 PM)
 
-Other (vague commit message):
-Brief description of other changes (Oct 31, 3:45 PM)
+## Improvements:
+- Faster loading in `index.html` - by Jane Smith (Nov 2, 4:15 PM)
 
-text
+- Better error messages in `api.py` - by John Doe (Nov 2, 2:00 PM)
+
+## Deletions:
+- Removed old config file `old_config.json` - by Bob Johnson (Nov 1, 3:00 PM)
+
+- Deleted unused feature from `legacy.py` - by Jane Smith (Nov 1, 2:00 PM)
+
+## Documentation:
+- Updated README.md with installation guide - by Jane Smith (Nov 1, 9:00 AM)
+
+## Other (vague commit message):
+- Updated dependencies in `package.json` - by John Doe (Oct 31, 3:45 PM)
 
 **Important Rules:**
-- Only include categories that have actual content
-- If there are no meaningful changes, say "No significant changes"
-- Group similar commits together
-- Be concise and user-focused
-- Use bullet points, not numbered lists
-- Always include the date and time in parentheses after each bullet point"""
+- Only include categories that have items
+- **Always mention the file name(s) affected** when available
+- Use simple, everyday language - no technical terms
+- Keep it short (1-2 lines max per item)
+- Use bullet points, not numbers
+- **Add a blank line after each bullet point**
+- **Always include " - by <Author Name>" before the timestamp**
+- Always include the date and time in parentheses
+- Make it easy for anyone to understand
+- For deletions, clearly state what file or feature was removed"""
 
         try:
             message = self.client.messages.create(
                 model="claude-sonnet-4-20250514",
-                max_tokens=2000,
+                max_tokens=4000,
                 temperature=0.3,
                 system=system_prompt,
                 messages=[
@@ -151,7 +171,6 @@ text
                 "tokens_used": 0
             }
 
-
 if __name__ == "__main__":
     service = AIService()
     
@@ -162,19 +181,7 @@ Date:   Sat Nov 8 15:24:30 2025 -0700
 
     ai_service changes
 
-commit 5e0314ddd2a0e3d8712917994ceaab64c36328ff
-Author: Brian Bao Hoang <brianhoang1225@gmail.com>
-Date:   Sat Nov 8 15:11:56 2025 -0700
-
-    new changes
-
-commit 9916615ff239e6f5521f84f876ba1f988be36405
-:
-commit 0b79cedf367caaf9e897b9eff74c079a4c71f897 (HEAD -> main)
-Author: Brian Bao Hoang <brianhoang1225@gmail.com>
-Date:   Sat Nov 8 15:24:30 2025 -0700
-
-    ai_service changes
+M       services/ai_service.py
 
 commit 5e0314ddd2a0e3d8712917994ceaab64c36328ff
 Author: Brian Bao Hoang <brianhoang1225@gmail.com>
@@ -182,34 +189,7 @@ Date:   Sat Nov 8 15:11:56 2025 -0700
 
     new changes
 
-commit 9916615ff239e6f5521f84f876ba1f988be36405
-Author: Devashish Shrestha <shresthdevashish@gmail.com>
-Date:   Sat Nov 8 14:53:45 2025 -0700
-
-    backend setup
-
-commit 1702dfb171c088ec035852eb283a0b21695fdf07
-Author: Devashish Shrestha <shresthdevashish@gmail.com>
-Date:   Sat Nov 8 14:22:57 2025 -0700
-
-    add .gitignore
-
-commit b861efb151dba23bbbc0184b4a509d413ef04c69
-Author: Devashish Shrestha <shresthdevashish@gmail.com>
-:
-commit 0b79cedf367caaf9e897b9eff74c079a4c71f897 (HEAD -> main)
-Author: Brian Bao Hoang <brianhoang1225@gmail.com>
-Date:   Sat Nov 8 15:24:30 2025 -0700
-
-    ai_service changes
-
-commit 5e0314ddd2a0e3d8712917994ceaab64c36328ff
-Author: Brian Bao Hoang <brianhoang1225@gmail.com>
-Date:   Sat Nov 8 15:11:56 2025 -0700
-
-    new changes
-
-commit 9916615ff239e6f5521f84f876ba1f988be36405
+A       cli/new_feature.py
 """
     
     result = service.generate_changelog(sample_log)
