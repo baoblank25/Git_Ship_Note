@@ -128,15 +128,31 @@ export default function Page() {
     setChangelog("");
   };
 
-  const exampleCommits = `feat: add real-time collaboration support for team workspaces
-feat: implement dark mode with system preference detection
-fix: resolve authentication timeout issue on slow connections
-fix: correct date formatting in export functionality
-perf: optimize image loading with lazy loading and WebP format
-perf: reduce initial bundle size by 40% through code splitting
-feat: add keyboard shortcuts for power users
-fix: prevent duplicate form submissions on double-click
-feat: introduce customizable dashboard widgets`;
+  const exampleCommits = `feat(api): add new endpoint for user preferences
+BREAKING CHANGE: new response format requires client update
+
+fix(auth): ensure proper token refresh on session timeout
+refs #123
+
+style(ui): improve button hover states and focus rings
+- Update primary button gradients
+- Add keyboard focus styles
+
+chore(deps): bump typescript from 4.9.4 to 4.9.5
+
+build(docker): optimize image size and build time
+- Use multi-stage builds
+- Add layer caching
+
+test(api): add integration tests for auth flow
+Closes #456
+
+refactor(core): simplify state management logic
+Co-authored-by: Jane Doe <jane@example.com>
+
+docs(readme): update installation steps
+- Add development setup guide
+- Include troubleshooting section`;
 
   const handleUseExample = () => {
     setGitLog(exampleCommits);
@@ -434,12 +450,13 @@ echo "4. Save to $OUTPUT_FILE"
                   <Textarea
                     value={gitLog}
                     onChange={(e) => setGitLog(e.target.value)}
-                    placeholder="Paste your git commits here, one per line:
+                    placeholder={`Paste your git logs here (one commit per line):
 
-feat: add real-time collaboration
-fix: resolve authentication timeout
-perf: optimize image loading
-..."
+a83b1c9 feat: add real-time collaboration support
+f2e4d8a fix: resolve authentication timeout issue  
+c9b7f3e perf: optimize image loading with lazy loading
+d1a6e4f docs: update API documentation
+...`}
                     className="min-h-[320px] font-mono text-sm bg-slate-50 dark:bg-slate-950 border-2 rounded-xl focus:outline-none transition-all"
                   />
                   <div className="flex gap-2 flex-wrap">
@@ -645,19 +662,32 @@ perf: optimize image loading
                       <h3 className="text-slate-900 dark:text-slate-100 mb-2">
                         Command Line Tool
                       </h3>
-                      <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 leading-relaxed">
-                        Extract commits directly from your local repository with
-                        our CLI tool. Works seamlessly with your existing git
-                        workflow.
-                      </p>
-                      <Button
-                        onClick={handleDownloadCLI}
-                        size="sm"
-                        className="gap-2 hover-lift bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white cursor-pointer"
-                      >
-                        <Download className="w-4 h-4" />
-                        Download CLI
-                      </Button>
+                      <div className="space-y-4">
+                        <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                          Extract commits directly from your local repository with
+                          our CLI tool. Works seamlessly with your existing git
+                          workflow.
+                        </p>
+                        <div className="pt-2">
+                          <Button
+                            onClick={handleDownloadCLI}
+                            size="sm"
+                            className="gap-2 hover-lift bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white cursor-pointer"
+                          >
+                            <Download className="w-4 h-4" />
+                            Download CLI
+                          </Button>
+                        </div>
+                        <a
+                          href="https://docs.github.com/en/github-cli/github-cli/quickstart"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+                        >
+                          <Github className="w-4 h-4" />
+                          GitHub CLI Quickstart Guide
+                        </a>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -674,17 +704,25 @@ perf: optimize image loading
                       <h3 className="text-slate-900 dark:text-slate-100 mb-2">
                         Pro Tips
                       </h3>
-                      <ul className="text-slate-600 dark:text-slate-400 text-sm space-y-2 leading-relaxed">
-                        <li>
-                          • Use conventional commits (feat:, fix:, perf:) for
-                          better categorization
-                        </li>
-                        <li>• Connect GitHub for automatic commit fetching</li>
-                        <li>
-                          • Review and edit generated changelogs before
-                          publishing
-                        </li>
-                      </ul>
+                      <div className="space-y-4">
+                        <ul className="text-slate-600 dark:text-slate-400 text-sm space-y-2 leading-relaxed">
+                          <li>
+                            • Follow conventional commits format:
+                            <br />
+                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">type(scope): description</code>
+                            <br />
+                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">BREAKING CHANGE: description</code>
+                          </li>
+                          <li>
+                            • Add detailed body and reference issues with keywords:
+                            <br />
+                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">refs #123</code> or <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">Closes #456</code>
+                          </li>
+                          <li>
+                            • Common types: feat, fix, docs, style, refactor, test, chore, build
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
