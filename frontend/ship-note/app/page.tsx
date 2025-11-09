@@ -26,7 +26,14 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { GitHubConnectModal } from "@/components/GitHubConnectModal";
 import { About } from "@/components/About";
-import { generateFromText, checkHealth } from "@/lib/api";
+import { generateFromText, checkHealth, generateFromGitHub } from "@/lib/api";
+import {
+  getAccessToken,
+  isValidGitHubUrl,
+  isGitHubConnected as checkGitHubConnection,
+  getUserInfo,
+} from "@/lib/github";
+import { Input } from "@/components/ui/input";
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState<"home" | "about">("about");
@@ -37,6 +44,8 @@ export default function Page() {
   const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
   const [isGitHubConnected, setIsGitHubConnected] = useState(false);
   const [githubUsername, setGithubUsername] = useState("");
+  const [githubRepoUrl, setGithubRepoUrl] = useState("");
+  const [isGeneratingFromGitHub, setIsGeneratingFromGitHub] = useState(false);
 
   // Initialize and persist theme
   useEffect(() => {
@@ -55,6 +64,18 @@ export default function Page() {
       localStorage.setItem("shipnote-theme", "light");
     }
   }, [isDarkMode]);
+
+  // Check for existing GitHub connection on mount
+  useEffect(() => {
+    if (checkGitHubConnection()) {
+      const userInfo = getUserInfo();
+      if (userInfo && userInfo.username) {
+        setIsGitHubConnected(true);
+        setGithubUsername(userInfo.username);
+        console.log("✅ GitHub connection restored:", userInfo.username);
+      }
+    }
+  }, []);
 
   // Check backend health on component mount
   useEffect(() => {
@@ -107,19 +128,91 @@ export default function Page() {
     setChangelog("");
   };
 
-  const exampleCommits = `feat: add real-time collaboration support for team workspaces
-feat: implement dark mode with system preference detection
-fix: resolve authentication timeout issue on slow connections
-fix: correct date formatting in export functionality
-perf: optimize image loading with lazy loading and WebP format
-perf: reduce initial bundle size by 40% through code splitting
-feat: add keyboard shortcuts for power users
-fix: prevent duplicate form submissions on double-click
-feat: introduce customizable dashboard widgets`;
+  const exampleCommits = `feat(api): add new endpoint for user preferences
+BREAKING CHANGE: new response format requires client update
+
+fix(auth): ensure proper token refresh on session timeout
+refs #123
+
+style(ui): improve button hover states and focus rings
+- Update primary button gradients
+- Add keyboard focus styles
+
+chore(deps): bump typescript from 4.9.4 to 4.9.5
+
+build(docker): optimize image size and build time
+- Use multi-stage builds
+- Add layer caching
+
+test(api): add integration tests for auth flow
+Closes #456
+
+refactor(core): simplify state management logic
+Co-authored-by: Jane Doe <jane@example.com>
+
+docs(readme): update installation steps
+- Add development setup guide
+- Include troubleshooting section`;
 
   const handleUseExample = () => {
     setGitLog(exampleCommits);
     setChangelog("");
+  };
+
+  const handleGenerateFromGitHub = async () => {
+    if (!githubRepoUrl.trim()) {
+      toast.error("Please enter a GitHub repository URL");
+      return;
+    }
+
+    if (!isValidGitHubUrl(githubRepoUrl)) {
+      toast.error(
+        "Please enter a valid GitHub repository URL (e.g., https://github.com/owner/repo)"
+      );
+      return;
+    }
+
+    if (!isGitHubConnected) {
+      toast.error("Please connect your GitHub account first");
+      setIsGitHubModalOpen(true);
+      return;
+    }
+
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      toast.error(
+        "GitHub access token not found. Please reconnect your account."
+      );
+      setIsGitHubConnected(false);
+      return;
+    }
+
+    setIsGeneratingFromGitHub(true);
+    setChangelog("");
+
+    try {
+      const result = await generateFromGitHub(accessToken, githubRepoUrl);
+
+      if (result.success && result.notes) {
+        setChangelog(result.notes);
+        toast.success(
+          `Generated changelog from ${result.commit_count} commits!`
+        );
+      } else {
+        throw new Error(
+          result.error || "Failed to generate changelog from GitHub"
+        );
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to generate changelog from GitHub";
+      toast.error(errorMessage);
+      console.error("GitHub changelog generation error:", error);
+    } finally {
+      setIsGeneratingFromGitHub(false);
+    }
   };
 
   const handleDownloadCLI = () => {
@@ -317,18 +410,18 @@ echo "4. Save to $OUTPUT_FILE"
           <About />
         ) : (
           <>
-            <div className="grid lg:grid-cols-2 gap-8 animate-scale-in">
+            <div className="grid lg:grid-cols-2 gap-8 animate-scale-in items-start">
               {/* Input Section */}
-              <Card className="glass-card shadow-2xl rounded-2xl overflow-hidden border-2">
+              <Card className="glass-card shadow-2xl rounded-2xl overflow-hidden border-2 self-start">
                 <CardHeader className="bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-950/20 dark:to-transparent">
                   <CardTitle className="flex items-center gap-3 dark:text-slate-100">
                     <div className="p-2 bg-blue-500/10 rounded-lg">
                       <Terminal className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <span>Input Git Logs</span>
+                    <span>Input Commits</span>
                   </CardTitle>
                   <CardDescription className="dark:text-slate-400">
-                    Paste your git log output or connect GitHub to auto-fetch
+                    Paste git commits or connect GitHub to auto-fetch
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 pt-6">
@@ -357,13 +450,13 @@ echo "4. Save to $OUTPUT_FILE"
                   <Textarea
                     value={gitLog}
                     onChange={(e) => setGitLog(e.target.value)}
-                    placeholder="Paste your git logs here (one commit per line):
+                    placeholder={`Paste your git logs here (one commit per line):
 
 a83b1c9 feat: add real-time collaboration support
 f2e4d8a fix: resolve authentication timeout issue  
 c9b7f3e perf: optimize image loading with lazy loading
 d1a6e4f docs: update API documentation
-..."
+...`}
                     className="min-h-[320px] font-mono text-sm bg-slate-50 dark:bg-slate-950 border-2 rounded-xl focus:outline-none transition-all"
                   />
                   <div className="flex gap-2 flex-wrap">
@@ -401,11 +494,55 @@ d1a6e4f docs: update API documentation
                       Example
                     </Button>
                   </div>
+
+                  {/* GitHub Repository URL Section */}
+                  <Separator className="my-6" />
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                      <Github className="w-4 h-4" />
+                      Or fetch from GitHub Repository
+                    </label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={githubRepoUrl}
+                        onChange={(e) => setGithubRepoUrl(e.target.value)}
+                        placeholder="https://github.com/owner/repository"
+                        disabled={isGeneratingFromGitHub || !isGitHubConnected}
+                        className="flex-1 font-mono text-sm border-2 rounded-lg"
+                      />
+                      <Button
+                        onClick={handleGenerateFromGitHub}
+                        disabled={
+                          isGeneratingFromGitHub ||
+                          !githubRepoUrl.trim() ||
+                          !isGitHubConnected
+                        }
+                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 hover-lift"
+                      >
+                        {isGeneratingFromGitHub ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Fetching...
+                          </>
+                        ) : (
+                          <>
+                            <Github className="w-4 h-4 mr-2" />
+                            Generate
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    {!isGitHubConnected && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400">
+                        ⚠️ Connect your GitHub account above to use this feature
+                      </p>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
 
               {/* Output Section */}
-              <Card className="glass-card shadow-2xl rounded-2xl overflow-hidden border-2">
+              <Card className="glass-card shadow-2xl rounded-2xl overflow-hidden border-2 min-h-[740px]">
                 <CardHeader className="bg-gradient-to-br from-purple-50/50 to-transparent dark:from-purple-950/20 dark:to-transparent">
                   <CardTitle className="flex items-center gap-3 dark:text-slate-100">
                     <div className="p-2 bg-purple-500/10 rounded-lg">
@@ -417,13 +554,10 @@ d1a6e4f docs: update API documentation
                     User-friendly release notes ready to share
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="pt-6">
-                  {isGenerating ? (
+                <CardContent className="pt-6 pb-6">
+                  {isGenerating || isGeneratingFromGitHub ? (
                     <div className="flex flex-col items-center justify-center min-h-[320px] text-slate-400 dark:text-slate-500">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full"></div>
-                        <Loader2 className="w-12 h-12 animate-spin mb-4 relative text-blue-600 dark:text-blue-400" />
-                      </div>
+                      <Loader2 className="w-12 h-12 animate-spin mb-4 text-blue-600 dark:text-blue-400" />
                       <p className="animate-pulse">
                         Generating your changelog...
                       </p>
@@ -528,19 +662,32 @@ d1a6e4f docs: update API documentation
                       <h3 className="text-slate-900 dark:text-slate-100 mb-2">
                         Command Line Tool
                       </h3>
-                      <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 leading-relaxed">
-                        Extract commits directly from your local repository with
-                        our CLI tool. Works seamlessly with your existing git
-                        workflow.
-                      </p>
-                      <Button
-                        onClick={handleDownloadCLI}
-                        size="sm"
-                        className="gap-2 hover-lift bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white cursor-pointer"
-                      >
-                        <Download className="w-4 h-4" />
-                        Download CLI
-                      </Button>
+                      <div className="space-y-4">
+                        <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                          Extract commits directly from your local repository with
+                          our CLI tool. Works seamlessly with your existing git
+                          workflow.
+                        </p>
+                        <div className="pt-2">
+                          <Button
+                            onClick={handleDownloadCLI}
+                            size="sm"
+                            className="gap-2 hover-lift bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white cursor-pointer"
+                          >
+                            <Download className="w-4 h-4" />
+                            Download CLI
+                          </Button>
+                        </div>
+                        <a
+                          href="https://docs.github.com/en/github-cli/github-cli/quickstart"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors"
+                        >
+                          <Github className="w-4 h-4" />
+                          GitHub CLI Quickstart Guide
+                        </a>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -557,17 +704,25 @@ d1a6e4f docs: update API documentation
                       <h3 className="text-slate-900 dark:text-slate-100 mb-2">
                         Pro Tips
                       </h3>
-                      <ul className="text-slate-600 dark:text-slate-400 text-sm space-y-2 leading-relaxed">
-                        <li>
-                          • Use conventional commits (feat:, fix:, perf:) for
-                          better categorization
-                        </li>
-                        <li>• Connect GitHub for automatic commit fetching</li>
-                        <li>
-                          • Review and edit generated changelogs before
-                          publishing
-                        </li>
-                      </ul>
+                      <div className="space-y-4">
+                        <ul className="text-slate-600 dark:text-slate-400 text-sm space-y-2 leading-relaxed">
+                          <li>
+                            • Follow conventional commits format:
+                            <br />
+                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">type(scope): description</code>
+                            <br />
+                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">BREAKING CHANGE: description</code>
+                          </li>
+                          <li>
+                            • Add detailed body and reference issues with keywords:
+                            <br />
+                            <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">refs #123</code> or <code className="bg-blue-100 dark:bg-blue-950 px-2 py-0.5 rounded text-blue-700 dark:text-blue-300">Closes #456</code>
+                          </li>
+                          <li>
+                            • Common types: feat, fix, docs, style, refactor, test, chore, build
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </CardContent>

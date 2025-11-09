@@ -2,6 +2,7 @@
 
 import { Sparkles, Github, Terminal, Zap, Clock, Code } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
+import Image from "next/image";
 
 export function About() {
   return (
@@ -34,7 +35,8 @@ export function About() {
             <p>
               Developer-focused git commit messages like{" "}
               <code className="bg-blue-100 dark:bg-blue-950 px-3 py-1 rounded-lg text-sm text-blue-700 dark:text-blue-300">
-                fix: (db) resolve n+1 query on user_model
+                fix(db): resolve n+1 query in user_model
+                refs #156
               </code>{" "}
               are essential for technical teams but meaningless to end users.
               When it&apos;s time to write release notes or communicate updates,
@@ -271,8 +273,8 @@ export function About() {
               { name: "React", color: "from-cyan-500 to-blue-500" },
               { name: "TypeScript", color: "from-blue-600 to-blue-700" },
               { name: "Tailwind CSS", color: "from-sky-500 to-cyan-500" },
-              { name: "Claude AI", color: "from-purple-500 to-purple-600" },
-              { name: "Lucide Icons", color: "from-orange-500 to-red-500" },
+              { name: "Claude AI", color: "from-amber-600 to-orange-700" },
+              { name: "Lucide Icons", color: "from-purple-500 to-purple-600" },
               { name: "GitHub API", color: "from-slate-600 to-slate-700" },
             ].map((tech) => (
               <span
@@ -306,11 +308,17 @@ export function About() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card hover-lift rounded-2xl border-2 overflow-hidden bg-gradient-to-br from-purple-50 to-white dark:from-purple-950/20 dark:to-slate-800">
+        <Card className="glass-card hover-lift rounded-2xl border-2 overflow-hidden bg-gradient-to-br from-amber-100 via-orange-100 to-white dark:from-amber-900/40 dark:via-orange-900/30 dark:to-slate-800">
           <CardContent className="pt-8 p-6">
             <div className="flex items-center gap-4 mb-4">
               <div className="p-3 bg-white dark:bg-slate-800 rounded-xl shadow-lg">
-                <Sparkles className="w-10 h-10 text-purple-600" />
+                <Image
+                  src="/images/ClaudeAI.png"
+                  alt="Claude AI Logo"
+                  width={40}
+                  height={40}
+                  className="w-10 h-10"
+                />
               </div>
               <h3 className="text-slate-900 dark:text-slate-100 text-xl">
                 Powered by Claude
