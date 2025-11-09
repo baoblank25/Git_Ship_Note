@@ -16,7 +16,7 @@ class GitService:
     Uses GitPython library to read commit history.
     """
     
-    def get_commits(self, repo_path: str, from_ref: Optional[str] = None, to_ref: str = 'HEAD') -> List[Dict]:
+    def get_commits(self, repo_path: str, from_ref: Optional[str] = None, to_ref: str = 'HEAD', limit: int = 50) -> List[Dict]:
         """
         Fetch commits from a Git repository.
         
@@ -32,35 +32,24 @@ class GitService:
             commits = git_service.get_commits("/path/to/repo", "v1.0.0", "HEAD")
         """
         try:
-            # Open the Git repository
             repo = Repo(repo_path)
-            
-            # Build commit range string
-            # If from_ref is provided: "from_ref..to_ref" (e.g., "v1.0.0..HEAD")
-            # If not provided: just "to_ref" (e.g., "HEAD")
             if from_ref:
                 commit_range = f"{from_ref}..{to_ref}"
             else:
                 commit_range = to_ref
-            
-            # Extract commits
             commits = []
-            for commit in repo.iter_commits(commit_range, max_count=100):
-                # Convert each Git commit into a dictionary
+            for commit in repo.iter_commits(commit_range, max_count=limit):
+                commit_date = datetime.fromtimestamp(commit.committed_date).strftime('%b %d, %I:%M %p')
                 commits.append({
-                    "hash": commit.hexsha[:7],  # Short hash (first 7 characters)
-                    "message": commit.message.strip(),  # Commit message
-                    "author": commit.author.name,  # Author name
-                    "date": datetime.fromtimestamp(commit.committed_date).isoformat(),  # ISO date format
-                    "files_changed": len(commit.stats.files)  # Number of files modified
+                    "hash": commit.hexsha[:7],
+                    "message": commit.message.strip(),
+                    "author": commit.author.name,
+                    "date": commit_date,
+                    "files_changed": len(commit.stats.files)
                 })
-            
             return commits
-            
         except Exception as e:
-            # Re-raise with more context
             raise Exception(f"Failed to fetch commits from {repo_path}: {str(e)}")
-
 
 # Test code (only runs when you execute this file directly)
 if __name__ == "__main__":

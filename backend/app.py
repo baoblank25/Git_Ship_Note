@@ -156,49 +156,24 @@ def fetch_commits():
 # Combined Endpoint: FETCH + GENERATE
 @app.route('/api/generate-from-repo', methods=['POST'])
 def generate_from_repo():
-    """
-    Convenience endpoint that combines fetch_commits + generate_notes.
-    The CLI tool can call this single endpoint to do everything in one request.
-    
-    Expected JSON input:
-    {
-        "repo_path": "/path/to/repo",
-        "from": "v1.0.0",
-        "to": "HEAD"
-    }
-    
-    Returns JSON:
-    {
-        "success": true,
-        "commits": [...],
-        "notes": "# Release Notes\n\n..."
-    }
-    """
     try:
         data = request.json
         repo_path = data.get('repo_path')
         from_ref = data.get('from', None)
         to_ref = data.get('to', 'HEAD')
+        limit = data.get('limit', 50)  # NEW: Accept limit parameter (default 50)
         
         if not repo_path:
-            return jsonify({
-                "success": False,
-                "error": "Repository path is required"
-            }), 400
+            return jsonify({"success": False, "error": "Repository path is required"}), 400
         
-        # Step 1: Fetch commits from the repository
-        commits = git_service.get_commits(repo_path, from_ref, to_ref)
+        # Pass limit to git_service
+        commits = git_service.get_commits(repo_path, from_ref, to_ref, limit=limit)
         
         if not commits:
-            return jsonify({
-                "success": False,
-                "error": "No commits found in the specified range"
-            }), 400
+            return jsonify({"success": False, "error": "No commits found in the specified range"}), 400
         
-        # Step 2: Generate release notes from those commits
         release_notes = ai_service.generate_release_notes(commits, from_ref, to_ref)
         
-        # Step 3: Return both commits and notes
         return jsonify({
             "success": True,
             "commits": commits,
@@ -208,10 +183,7 @@ def generate_from_repo():
         
     except Exception as e:
         print(f"Error in generate_from_repo: {str(e)}")
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
+        return jsonify({"success": False, "error": str(e)}), 500
     
 
 # Quick PASTE ENDPOINT (For Website)

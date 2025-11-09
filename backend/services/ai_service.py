@@ -33,18 +33,11 @@ class AIService:
         """
         # Format commits into readable text
         commit_text = "\n".join([
-            f"- {commit['hash']}: {commit['message']} (by {commit.get('author', 'Unknown')})"
-            for commit in commits
+            f"- {commit['message']} - by {commit.get('author', 'Unknown')} ({commit['date']})" for commit in commits
         ])
-        
-        # Use the existing generate_changelog method
         git_log = f"Commits from {from_ref or 'start'} to {to_ref}:\n\n{commit_text}"
         result = self.generate_changelog(git_log)
-        
-        if result['success']:
-            return result['changelog']
-        else:
-            raise Exception(result['error'])
+        return result['changelog'] if result['success'] else ''
         
     def generate_changelog(self, git_log: str) -> Dict[str, Any]:
         system_prompt = """You are a professional technical writer who creates simple, easy-to-read changelogs.
