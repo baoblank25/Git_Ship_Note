@@ -2,6 +2,7 @@
 
 import { Sparkles, Github, Terminal, Zap, Clock, Code } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
+import Image from "next/image";
 
 export function About() {
   return (
@@ -310,7 +311,13 @@ export function About() {
           <CardContent className="pt-8 p-6">
             <div className="flex items-center gap-4 mb-4">
               <div className="p-3 bg-white dark:bg-slate-800 rounded-xl shadow-lg">
-                <Sparkles className="w-10 h-10 text-purple-600" />
+                <Image
+                  src="/images/ClaudeAI.png"
+                  alt="Claude AI Logo"
+                  width={40}
+                  height={40}
+                  className="w-10 h-10"
+                />
               </div>
               <h3 className="text-slate-900 dark:text-slate-100 text-xl">
                 Powered by Claude
