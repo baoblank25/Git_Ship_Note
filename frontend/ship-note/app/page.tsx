@@ -325,10 +325,10 @@ echo "4. Save to $OUTPUT_FILE"
                     <div className="p-2 bg-blue-500/10 rounded-lg">
                       <Terminal className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <span>Input Commits</span>
+                    <span>Input Git Logs</span>
                   </CardTitle>
                   <CardDescription className="dark:text-slate-400">
-                    Paste git commits or connect GitHub to auto-fetch
+                    Paste your git log output or connect GitHub to auto-fetch
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 pt-6">
@@ -357,19 +357,20 @@ echo "4. Save to $OUTPUT_FILE"
                   <Textarea
                     value={gitLog}
                     onChange={(e) => setGitLog(e.target.value)}
-                    placeholder="Paste your git commits here, one per line:
+                    placeholder="Paste your git logs here (one commit per line):
 
-feat: add real-time collaboration
-fix: resolve authentication timeout
-perf: optimize image loading
+a83b1c9 feat: add real-time collaboration support
+f2e4d8a fix: resolve authentication timeout issue  
+c9b7f3e perf: optimize image loading with lazy loading
+d1a6e4f docs: update API documentation
 ..."
-                    className="min-h-[320px] font-mono text-sm bg-slate-50 dark:bg-slate-950 border-2 rounded-xl focus:ring-2 focus:ring-blue-500/50 transition-all"
+                    className="min-h-[320px] font-mono text-sm bg-slate-50 dark:bg-slate-950 border-2 rounded-xl focus:outline-none transition-all"
                   />
                   <div className="flex gap-2 flex-wrap">
                     <Button
                       onClick={handleGenerate}
                       disabled={isGenerating || !gitLog.trim()}
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg shadow-blue-500/30 hover-lift"
+                      className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 hover-lift"
                     >
                       {isGenerating ? (
                         <>
@@ -520,7 +521,7 @@ perf: optimize image loading
               <Card className="glass-card hover-lift rounded-2xl border-2 overflow-hidden">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <div className="p-3 bg-gradient-to-br from-slate-500 to-slate-700 dark:from-slate-600 dark:to-slate-800 rounded-xl shadow-lg">
+                    <div className="p-3 bg-gradient-to-br from-slate-500 to-slate-700 dark:from-slate-600 dark:to-slate-800 rounded-xl">
                       <Terminal className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
@@ -534,18 +535,12 @@ perf: optimize image loading
                       </p>
                       <Button
                         onClick={handleDownloadCLI}
-                        variant="outline"
                         size="sm"
-                        className="gap-2 hover-lift border-2"
+                        className="gap-2 hover-lift bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white cursor-pointer"
                       >
                         <Download className="w-4 h-4" />
                         Download CLI
                       </Button>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
-                        <code className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
-                          chmod +x shipnote.sh
-                        </code>
-                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -555,7 +550,7 @@ perf: optimize image loading
               <Card className="glass-card hover-lift rounded-2xl border-2 overflow-hidden">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg shadow-blue-500/20">
+                    <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl">
                       <Sparkles className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">

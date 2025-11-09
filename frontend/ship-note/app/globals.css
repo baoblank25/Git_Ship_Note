@@ -125,7 +125,8 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
+    outline: none;
   }
 
   body {
@@ -138,7 +139,7 @@
  * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
  */
 @layer base {
-  :where(:not(:has([class*=' text-']), :not(:has([class^='text-'])))) {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
     h1 {
       font-size: var(--text-2xl);
       font-weight: var(--font-weight-medium);
@@ -225,11 +226,11 @@ html {
 
   /* Hover effects */
   .hover-lift {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer;
   }
 
   .hover-glow {
-    @apply transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/20;
+    @apply transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/20 cursor-pointer;
   }
 }
 
@@ -285,7 +286,8 @@ html {
 
 /* Gradient animation */
 @keyframes gradient {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
