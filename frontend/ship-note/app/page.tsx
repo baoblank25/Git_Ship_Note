@@ -538,12 +538,9 @@ perf: optimize image loading
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6 pb-6">
-                  {isGenerating ? (
+                  {isGenerating || isGeneratingFromGitHub ? (
                     <div className="flex flex-col items-center justify-center min-h-[320px] text-slate-400 dark:text-slate-500">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full"></div>
-                        <Loader2 className="w-12 h-12 animate-spin mb-4 relative text-blue-600 dark:text-blue-400" />
-                      </div>
+                      <Loader2 className="w-12 h-12 animate-spin mb-4 text-blue-600 dark:text-blue-400" />
                       <p className="animate-pulse">
                         Generating your changelog...
                       </p>
