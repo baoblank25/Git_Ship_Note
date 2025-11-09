@@ -508,7 +508,7 @@ perf: optimize image loading
               </Card>
 
               {/* Output Section */}
-              <Card className="glass-card shadow-2xl rounded-2xl overflow-hidden border-2 min-h-[735px]">
+              <Card className="glass-card shadow-2xl rounded-2xl overflow-hidden border-2 min-h-[740px]">
                 <CardHeader className="bg-gradient-to-br from-purple-50/50 to-transparent dark:from-purple-950/20 dark:to-transparent">
                   <CardTitle className="flex items-center gap-3 dark:text-slate-100">
                     <div className="p-2 bg-purple-500/10 rounded-lg">
